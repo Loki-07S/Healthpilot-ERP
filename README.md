@@ -1,260 +1,138 @@
-<h1 align="center">Admin Dashboard Template with Next.js &amp; Shadcn UI</h1>
+# HealthPilot ERP — Multi-Branch Hospital Pharmacy
 
-<div align="center">Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript</div>
-
-<div align="center">
-  <a href="https://dub.sh/shadcn-dashboard"><strong>View Demo</strong></a>
-</div>
-
-<br />
-
-<div align="center">
-  <img src="/public/shadcn-dashboard.png" alt="Shadcn Dashboard Cover" style="max-width: 100%; border-radius: 8px;" />
-</div>
-
-<br />
-
-<p align="center">
-  <a href="https://github.com/Kiranism/next-shadcn-dashboard-starter/stargazers"><img src="https://img.shields.io/github/stars/Kiranism/next-shadcn-dashboard-starter?style=social" alt="GitHub stars" /></a>
-  <a href="https://github.com/Kiranism/next-shadcn-dashboard-starter/network/members"><img src="https://img.shields.io/github/forks/Kiranism/next-shadcn-dashboard-starter?style=social" alt="Forks" /></a>
-  <a href="https://github.com/Kiranism/next-shadcn-dashboard-starter/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Kiranism/next-shadcn-dashboard-starter" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/Next.js-16-black" alt="Next.js" />
-  <a href="https://go.clerk.com/ILdYhn7"><img src="https://img.shields.io/badge/Sponsored_by-Clerk-6C47FF?style=flat-square&logo=clerk" alt="Sponsored by Clerk" /></a>
-</p>
-
-## Overview
-
-A free, open source (MIT) admin dashboard starter built with Next.js 16, shadcn/ui on Base UI primitives, TypeScript, and Tailwind CSS v4.
-
-Every feature is a working, production-ready implementation, not static demo UI. Tables search, filter, sort, and paginate for real. Forms validate and mutate with cache invalidation.
-Auth, organizations, and billing function end-to-end.
-
-Clone it, strip what you don't need with the built-in cleanup script, and start building on patterns you'd write yourself. It works well as a base for SaaS apps, internal tools, and admin panels.
-
-### Why This Template
-
-Most dashboard templates are static demo boilerplates: screens that look finished but need rebuilding the moment you wire in real data. This starter takes the opposite approach:
-
-- **Everything actually works.** Data tables run end-to-end: server prefetch, client-side React Query cache, and URL-synced search, filtering, sorting, and pagination via nuqs. Forms are built from reusable, composable fields with Zod validation, including advanced patterns like multi-step and dialog/sheet forms, with real create/update mutations and cache invalidation on success.
-- **Industry-standard implementations.** The data layer follows the official TanStack Query SSR pattern (server prefetch + `HydrationBoundary` + `useSuspenseQuery`), typed end to end, organized in a feature-based structure with a clean API layer per feature. These are patterns you copy into production code as-is, not mockups you rebuild from scratch.
-- **Minimal by design.** Deliberately lean, with no bloated boilerplate, so you spend your time tweaking it to your use case, not deleting someone else's code. The built-in [cleanup script](#cleanup-script-start-minimal-in-60-seconds) strips any feature you don't need in under a minute.
-
-### Tech Stack
-
-- Framework - [Next.js 16](https://nextjs.org/16)
-- Language - [TypeScript](https://www.typescriptlang.org)
-- Auth - [Clerk](https://go.clerk.com/ILdYhn7)
-- Error tracking - [Sentry](https://sentry.io/for/nextjs/?utm_source=github&utm_medium=paid-community&utm_campaign=general-fy26q2-nextjs&utm_content=github-banner-project-tryfree)
-- Styling - [Tailwind CSS v4](https://tailwindcss.com)
-- Components - [shadcn/ui](https://ui.shadcn.com) on [Base UI](https://base-ui.com) primitives
-- Charts - [Recharts](https://recharts.org) • [Evil Charts](https://evilcharts.com/)
-- Schema validation - [Zod](https://zod.dev)
-- Data fetching - [TanStack React Query](https://tanstack.com/query)
-- State management - [Zustand](https://zustand-demo.pmnd.rs)
-- Search param state - [Nuqs](https://nuqs.47ng.com/)
-- Tables - [TanStack Data Tables](https://ui.shadcn.com/docs/components/data-table) • [Dice Table](https://diceui.com/docs/components/data-table)
-- Forms - [TanStack Form](https://tanstack.com/form) + [Zod](https://zod.dev)
-- Command+K interface - [kbar](https://kbar.vercel.app/)
-- Linter / Formatter - [OxLint](https://oxc.rs/docs/guide/usage/linter) • [Oxfmt](https://oxc.rs/docs/guide/usage/formatter)
-- Pre-commit hooks - [Husky](https://typicode.github.io/husky/)
-- Themes - [tweakcn](https://tweakcn.com/)
-
-_Looking for a TanStack Start version? Here's the [repo](https://git.new/tanstack-start-dashboard)._
-
-## Features
-
-- Pre-built dashboard layout with sidebar, header, and content area
-- Analytics overview page with cards and charts
-- Data tables with React Query prefetch, client-side cache, search, filter, and pagination
-- Authentication and user management through Clerk
-- Multi-tenant workspaces using Clerk Organizations (create, switch, manage teams)
-- Billing and subscriptions via Clerk Billing for B2B, with plan management and feature gating
-- Client-side RBAC navigation that filters menu items by organization, permissions, and roles
-- Infobar component for tips, status messages, or contextual notes on any page
-- shadcn/ui components on Base UI primitives, styled with Tailwind CSS
-- Six-plus themes with a theme switcher
-- Feature-based folder structure
-- A starting point for SaaS dashboards, internal tools, and client admin panels
-
-## Use Cases
-
-A few things you can build with it:
-
-- SaaS admin dashboards
-- Internal tools and operations panels
-- Analytics dashboards
-- Client project admin panels
-- A boilerplate for new Next.js shadcn projects
-
-## Pages
-
-| Page                                                                                                                                                                  | Notes                                                                                                                                                                                |
-| :------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Signup / Signin](https://go.clerk.com/ILdYhn7)                                                                                                                       | Auth handled by Clerk, with passwordless sign-in, social logins, and enterprise SSO. |
-| [Dashboard Overview](https://shadcn-dashboard.kiranism.dev/dashboard)                                                                                                 | Cards and Recharts graphs. Parallel routes give each section its own loading and error state.                                                                                       |
-| [Product List (Table)](https://shadcn-dashboard.kiranism.dev/dashboard/product)                                                                                       | TanStack Table plus React Query (server prefetch, client cache) with nuqs URL state for search, filter, and pagination. `shallow: true` keeps interactions on the client.           |
-| [Create Product Form](https://shadcn-dashboard.kiranism.dev/dashboard/product/new)                                                                                    | TanStack Form and Zod with `useMutation` for create and update. Cache is invalidated on success.                                                                                    |
-| [Users (Table)](https://shadcn-dashboard.kiranism.dev/dashboard/users)                                                                                                | Same setup as Products: React Query with nuqs, server prefetch, and client-side pagination and filtering.                                                                           |
-| [React Query Demo](https://shadcn-dashboard.kiranism.dev/dashboard/react-query)                                                                                       | A Pokemon API example showing the server prefetch, `HydrationBoundary`, and `useSuspenseQuery` pattern with client-side cache. |
-| [Profile](https://shadcn-dashboard.kiranism.dev/dashboard/profile)                                                                                                   | Clerk's account management UI for profile and security settings. |
-| [Kanban Board](https://shadcn-dashboard.kiranism.dev/dashboard/kanban)                                                                                                | Drag-and-drop task board built with dnd-kit and Zustand. Column sorting, priority badges, assignees, and due dates. |
-| [Chat](https://shadcn-dashboard.kiranism.dev/dashboard/chat)                                                                                                          | Messaging UI with a conversation list, message bubbles, quick replies, attachments, and an auto-reply demo. Multi-panel layout that works on mobile. |
-| [AI Chat](https://shadcn-dashboard.kiranism.dev/dashboard/ai-chat)                                                                                                    | Scripted AI chat that streams a predefined conversation through the real `useChat` lifecycle — no model, API route, or key. Built with the shadcn chat components (MessageScroller, Bubble, Marker). |
-| [Notifications](https://shadcn-dashboard.kiranism.dev/dashboard/notifications)                                                                                        | Notification center with a header badge, popover preview, and a full page with All / Unread / Read tabs. Includes mark-as-read and mark-all-as-read. |
-| [Workspaces](https://shadcn-dashboard.kiranism.dev/dashboard/workspaces)                                                                                              | Organization management using Clerk's `<OrganizationList />`. View, create, and switch between organizations. |
-| [Team Management](https://shadcn-dashboard.kiranism.dev/dashboard/workspaces/team)                                                                                    | Team management using Clerk's `<OrganizationProfile />`. Manage members, roles, permissions, security, and org details. Needs an active organization. |
-| [Billing & Plans](https://shadcn-dashboard.kiranism.dev/dashboard/billing)                                                                                            | Billing page using Clerk's `<PricingTable />`. View plans, subscribe, and manage subscriptions. Needs an active organization. |
-| [Exclusive Page](https://shadcn-dashboard.kiranism.dev/dashboard/exclusive)                                                                                           | Plan-based access control with Clerk's `<Show>`. Only available to organizations on the Pro plan, with a fallback UI for everyone else. |
-| [Not Found](https://shadcn-dashboard.kiranism.dev/dashboard/notfound)                                                                                                 | A root-level not-found page.                                                                                                                                                        |
-| [Global Error](https://sentry.io/for/nextjs/?utm_source=github&utm_medium=paid-community&utm_campaign=general-fy26q2-nextjs&utm_content=github-banner-project-tryfree) | A shared error page wired to Sentry for logging, reports, and session replay. |
-
-## Folder Structure
-
-```plaintext
-src/
-├── app/                           # Next.js App Router directory
-│   ├── auth/                      # Auth pages (sign-in, sign-up)
-│   ├── dashboard/                 # Dashboard route group
-│   │   ├── overview/              # Analytics with parallel routes
-│   │   ├── product/               # Product CRUD pages (React Query)
-│   │   ├── users/                 # Users table (React Query + nuqs)
-│   │   ├── react-query/           # React Query demo page
-│   │   ├── kanban/                # Task board page
-│   │   ├── chat/                  # Messaging page
-│   │   ├── ai-chat/               # AI chat streaming demo
-│   │   ├── notifications/         # Notifications page
-│   │   ├── workspaces/            # Org management & teams
-│   │   ├── billing/               # Billing & plans
-│   │   ├── profile/               # User profile
-│   │   └── exclusive/             # Plan-gated page
-│   └── api/                       # API routes
-│
-├── components/                    # Shared components
-│   ├── ui/                        # UI primitives (buttons, inputs, dialogs, etc.)
-│   ├── layout/                    # Layout components (header, sidebar, etc.)
-│   ├── themes/                    # Theme system (selector, mode toggle, config)
-│   └── kbar/                      # Command+K interface
-│
-├── features/                      # Feature-based modules
-│   ├── overview/                  # Dashboard analytics (charts, cards)
-│   ├── products/                  # Product listing, form, tables (React Query)
-│   ├── users/                     # User management table (React Query)
-│   ├── react-query-demo/          # React Query demo (Pokemon API)
-│   ├── kanban/                    # Drag-drop task board
-│   ├── chat/                      # Messaging (conversations, bubbles, composer)
-│   ├── ai-chat/                   # Scripted useChat streaming demo (shadcn chat UI)
-│   ├── notifications/             # Notification center & store
-│   ├── auth/                      # Auth components
-│   └── profile/                   # Profile form schemas
-│
-├── lib/                           # Core utilities (query-client, searchparams, etc.)
-├── hooks/                         # Custom hooks
-├── config/                        # Navigation, infobar, data table config
-├── constants/                     # Mock data
-├── styles/                        # Global CSS & theme files
-│   └── themes/                    # Individual theme CSS files
-└── types/                         # TypeScript types
-```
-
-## Getting Started
-
-> [!NOTE]
-> This starter uses Next.js 16 (App Router) with React 19 and shadcn/ui. To run it locally:
-
-Clone the repo:
-
-```
-git clone https://github.com/Kiranism/next-shadcn-dashboard-starter.git
-```
-
-- `bun install`
-- Copy the example env file: `cp env.example.txt .env.local`
-- Fill in the required variables in `.env.local`
-- `bun run dev`
-
-##### Environment variables
-
-See `env.example.txt` for the variables you need. They cover authentication and error tracking.
-
-##### Clerk setup
-
-For setting up Clerk auth (including organizations, workspaces, and teams), see [clerk_setup.md](./docs/clerk_setup.md).
-
-The app should now be running at http://localhost:3000.
-
-> [!WARNING]
-> After cloning or forking, be careful when pulling the latest changes. Updates can cause merge conflicts.
+> **HealthPilot.ai Candidate Build Challenge**  
+> An enterprise-grade, append-only pharmacy ERP tracking medicines from branch demand through procurement, receiving, immutable error correction, three-way match supplier settlement, inter-branch transfer, and FEFO dispensing.
 
 ---
 
-## Cleanup Script: Start Minimal in 60 Seconds
+## 🚀 Quick Start & Run Instructions
 
-Most starters make you hand-delete demo pages and rip out dependencies. This one ships with a cleanup script that removes the optional features you don't need (folders, files, dependencies, docs, and env entries), leaving a minimal base to build on. Run `--list` to see what's removable:
+### Prerequisites
+- **Node.js**: v20+ (`>= 20.9.0`)
+- **Database**: PostgreSQL (Supabase / Neon connection string)
 
+### 1. Installation & Environment
 ```bash
-bun run cleanup --interactive    # interactive mode
-bun run cleanup --list           # see available features
-bun run cleanup --dry-run chat   # preview before removing
-bun run cleanup kanban chat      # remove specific features
+# Clone the repository and navigate into the app
+cd healthpilot-erp
+
+# Copy environment template
+cp .env.example .env
+# Ensure DATABASE_URL and DIRECT_URL are configured in .env
 ```
 
-Run `bun run cleanup --help` for all options (with npm, pass flags after `--`: `npm run cleanup -- --list`). The replacement files it writes live in `scripts/cleanup-templates/` as real, typechecked code. When you're done, delete `scripts/cleanup.js`, `scripts/cleanup-templates/`, and the `cleanup` entry in `package.json`.
+### 2. Database Migration & Baseline Seed
+```bash
+# Generate Prisma Client & apply schema migrations
+npx prisma generate
+npx prisma migrate dev
 
-## FAQ
+# Seed foundational master records (opening stock = 0 at all locations)
+npx prisma db seed
+```
 
-**Is it production ready?**
-Yes. Every feature is a complete, working implementation: authentication, CRUD flows, table search/filter/sort/pagination, and form validation with mutations all function end-to-end. It's a starting point for real applications, not a visual mockup.
+### 3. Run Scenario & Automated Verification (8/8 Checks)
+```bash
+# Execute the full challenge scenario (MR -> PO -> GRN -> Reversal/Amend -> Invoice -> Transfer -> Dispense)
+npx tsx scripts/execute-full-scenario.ts
 
-**How is this different from other dashboard templates?**
-Most dashboard templates are static demo boilerplates: screens that look finished but need rebuilding once you wire in real data. Here the tables, forms, auth, organizations, and billing all work end-to-end, the implementations follow official TanStack and Next.js patterns, and a cleanup script keeps the base minimal so you tweak it to your use case instead of deleting code.
+# Run the automated 8-point challenge assertion test suite
+npx tsx scripts/run-scenario.ts
+```
 
-**Is it free for commercial use?**
-Yes. MIT-licensed and free for both personal and commercial projects: no paid tier, no license keys.
+### 4. Start Development Server
+```bash
+npm run dev
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
-**Can I use it without Clerk?**
-Yes. Run `bun run cleanup clerk` to remove Clerk authentication (along with organizations and billing) and wire in your own auth solution.
+---
 
-**How do I remove demo pages or features I don't need?**
-Run `bun run cleanup --interactive` and pick what to strip, or `bun run cleanup --list` to see what can be removed.
+## 👥 Demo Staff Personas & Credentials
 
-**Does it support Next.js 16, React 19, and Tailwind CSS v4?**
-Yes. The template is built on Next.js 16 (App Router), React 19, and Tailwind CSS v4, with shadcn/ui on Base UI primitives, and is actively maintained to track new releases.
+The application includes a staff role switcher in the top navigation bar and a dedicated authentication directory at **`/login`** to demonstrate role segregation:
 
-**Can I use npm instead of Bun?**
-Yes. Bun is preferred, but npm works too, and the repo even ships both Node.js and Bun Dockerfiles for deployment.
+| Staff Member | Persona Role | Authorized ERP Operations | Forbidden Actions |
+|---|---|---|---|
+| **Dr. Priya Sharma** | `PHARMACIST` | Create Requisitions (`MR-XXXX`), Confirm Transfer Receipt, Dispense Prescriptions (`SAL-XXXX`) | Cannot approve MRs, issue POs, receive supplier GRNs, or approve invoices |
+| **Rajesh Patel** | `PURCHASE_MANAGER` | Review & Approve Branch Requisitions, Issue Supplier Purchase Orders (`PO-XXXX`) | Cannot record GRN deliveries or dispense medicines |
+| **Vikram Singh** | `STORE_KEEPER` | Receive Goods Receipt Notes (`GRN-XXXX`), Reverse & Amend Receipts, Dispatch Stock Transfers | Cannot approve purchase orders or dispense prescriptions |
+| **Ananya Iyer** | `ACCOUNTS` | Three-Way Match Verification, Record Supplier Invoices (`SI-XXXX`), Issue Credit Notes (`CN-XXXX`) | Cannot physically receive, transfer, or dispense stock |
+| **System Admin** | `ADMIN` | All operations + System Configuration + One-Click Challenge Baseline Reset | Unrestricted |
 
-**Does it work with AI coding assistants?**
-Yes. The repo ships AGENTS.md and CLAUDE.md with the project's conventions, plus a bundled Claude Code skill (`.claude/skills/kiranism-shadcn-dashboard`) that teaches agents how to add pages, tables, forms, and navigation the template way. Works with Claude Code, Cursor, and any tool that reads AGENTS.md.
+---
 
-**What data fetching pattern does it use?**
-TanStack React Query with the official SSR pattern: `queryClient.query()` prefetch on the server, `HydrationBoundary` with `dehydrate` for hydration, and `useSuspenseQuery` on the client, plus nuqs for URL-synced search-param state. Mutations invalidate the cache on success.
+## 📖 Standard ERP Terminology Mapping (Challenge 40% Weight)
 
-**How do I deploy it?**
-Deploy to Vercel out of the box, or use the included Docker setups: a Node.js Dockerfile and a Bun Dockerfile, both using Next.js standalone output mode. See the [deployment guide](./docs/deployment.md).
+The challenge prompt intentionally uses plain language for business operations. The table below maps each business step to standard industry ERP terminology:
 
-## Deploy
+| Challenge Plain Language | Standard ERP Document / Concept | System Code & Implementation |
+|---|---|---|
+| *"Hospital branches raise stock requirements"* | **Material Requisition (MR)** | `MR-0001` to `MR-0006` |
+| *"Central team places supplier order"* | **Purchase Order (PO)** | `PO-0001` (linked to source MR) |
+| *"Supplier delivery arrives"* | **Goods Receipt Note (GRN)** | `GRN-0001` (Delivery Challan reference) |
+| *"Completed receiving transaction is wrong"* | **Reverse & Amend / Contra Ledger** | Equal-and-opposite ledger entry (`-100`) + Amended `GRN-0002` |
+| *"Damaged vials"* | **Quarantine Inventory (Hold)** | `QUARANTINE` status (isolated from dispensing) |
+| *"Missing from delivery"* | **Short Delivery / Discrepancy** | Tracked on GRN; excluded from physical stock ledger |
+| *"Supplier invoice does not match"* | **Three-Way Match Discrepancy** | Automated formula: PO qty ↔ GRN accepted qty ↔ Invoice |
+| *"Supplier agrees to credit note"* | **Credit Note (Supplier AP Memo)** | `CN-0001` (offsets accounts payable discrepancy) |
+| *"Vials move between locations"* | **Inter-Branch Stock Transfer (ST)** | `ST-0001` with explicit `IN_TRANSIT` status |
+| *"Sell and dispense against prescription"* | **Sales Invoice / Prescription Dispense** | `SAL-0001` with **FEFO** batch selection & COGS recognition |
+| *"Movement history & balance"* | **Stock Ledger (Double-Entry / Append-Only)** | `StockLedgerEntry` table (`SUM(qty)`) |
 
-Deploy to Vercel out of the box, or use the included Docker setups: a Node.js Dockerfile and a Bun Dockerfile, both using Next.js standalone output mode. Full guide: [docs/deployment.md](./docs/deployment.md).
+---
 
-### Support
+## 📊 End-to-End Scenario Reconciliation (Target vs Actual)
 
-If this template saved you some time, a star is appreciated. You can also [buy me a coffee](https://buymeacoffee.com/kiranism) if you'd like.
+| Inventory / Financial Metric | Challenge Target Specification | Actual Verified System State | Status |
+|---|---|---|---|
+| **Central Warehouse — Usable Stock** | 40 vials | **40 vials** | ✅ MATCH |
+| **Central Warehouse — Quarantine Stock** | 20 vials | **20 vials** | ✅ MATCH |
+| **Central Warehouse — In-Transit Stock** | 0 vials | **0 vials** | ✅ MATCH |
+| **Branch A — Usable Stock** | 25 vials | **25 vials** | ✅ MATCH |
+| **Branch A — Dispensed Stock** | 5 vials | **5 vials** | ✅ MATCH |
+| **Short Delivery (Missing)** | 10 vials | **10 vials** | ✅ MATCH |
+| **Total Vials Accounted For** | **100 vials** | **100 vials** | ✅ MATCH |
+| **Supplier Invoice Total** | ₹52,500 | **₹52,500** | ✅ MATCH |
+| **Payable to Supplier** | ₹36,750 | **₹36,750** | ✅ MATCH |
+| **Disputed Supplier Amount** | ₹15,750 | **₹15,750** | ✅ MATCH |
+| **Credit Note Issued** | ₹15,750 | **₹15,750** | ✅ MATCH |
+| **COGS Recognized at Dispensing** | ₹2,500 | **₹2,500** | ✅ MATCH |
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=flat-square&logo=buymeacoffee)](https://buymeacoffee.com/kiranism)
+---
 
-<!--
+## 🔍 Assumptions & Architecture Decisions
 
-SEO keywords:
+1. **Append-Only Immutable Ledger**: Stock balances are never modified using SQL `UPDATE` or `DELETE`. Every movement is an immutable insert (`StockLedgerEntry`). The on-hand balance for any item, location, or batch is calculated as `SUM(qty)`.
+2. **Reverse & Amend Pattern**: Corrections to completed transactions post equal-and-opposite contra entries (`qty = -100`), preserving the full historical audit trail including original creator, timestamps, error reason, and correcting officer.
+3. **Short Delivery Accounting**: Missing vials (10 vials) are documented on the GRN document record but do not generate physical ledger entries since goods were never physically present in the warehouse.
+4. **Cold-Chain Quarantine Isolation**: Damaged vials (temperature breach > 8°C) are registered under `QUARANTINE` status and strictly isolated so they cannot be picked by FEFO or dispatched on inter-branch transfers.
+5. **FEFO (First-Expiry, First-Out)**: Dispensing queries batches ordered by `expiryDate ASC` and automatically prevents dispensing from non-usable stock statuses.
+6. **Two-Stage Stock Transfers**: Inter-branch transfers transition through an explicit `IN_TRANSIT` state between central dispatch and branch receipt to eliminate phantom stock.
 
-open source admin dashboard, nextjs admin dashboard, nextjs dashboard template,
+---
 
-shadcn ui dashboard, admin dashboard starter, next.js 16, typescript dashboard,
+## 📚 Sources Studied
+- **SAP ERP & NetSuite Inventory Management**: Standard documentation on Goods Receipt PO matching, Return-to-Vendor, and Stock Transport Orders (STO).
+- **ERPNext / Frappe Framework**: Core design patterns for immutable `Stock Ledger Entry`, Reverse & Amend document workflows, and Three-Way Match verification.
+- **GS1 Healthcare Standards**: Best practices for pharmaceutical traceability, lot/batch tracking, expiry date management, and cold-chain temperature control.
 
-dashboard ui template, nextjs shadcn admin panel, react admin dashboard,
+---
 
-tailwind css admin dashboard, production ready admin dashboard template,
+## 🤖 AI Tools Used
+- **Google Antigravity Agentic AI Assistant**: Architecture formulation, scaffolding, TypeScript validation, and scenario execution testing.
+- **Validation**: All AI-assisted code was tested and confirmed using automated determinism scripts (`scripts/run-scenario.ts`) ensuring 100% compliance with business calculations.
 
-free react admin dashboard, nextjs 16 dashboard starter, working crud dashboard
+---
 
--->
+## 📦 Important Third-Party Components
+- **Next.js 16 (App Router) & React 19**: Server Component architecture and streaming.
+- **Prisma ORM 6**: Schema-first modeling with relations, database migrations, and transactional batching.
+- **Tailwind CSS & shadcn/ui**: Modern, accessible ERP component primitives.
+- **@tabler/icons-react**: Clean, consistent icon set for actions, document workflows, and audit statuses.
 
+---
+
+## 🛠️ AI Tools & Disclosure
+- Developed with assistance from **Google Antigravity Agentic AI Assistant**.
+- All business logic, ledger rules, and financial calculations were validated against the challenge specification and confirmed by deterministic assertion suites.

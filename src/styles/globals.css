@@ -639,3 +639,15 @@
     -webkit-text-fill-color: currentColor;
   }
 }
+
+/* Hide floating dev tools indicator / Next.js badge in bottom right corner */
+nextjs-portal,
+[data-nextjs-dev-tools-button],
+[data-nextjs-toast-wrapper],
+[data-nextjs-toast],
+div:has(> [data-nextjs-dev-tools-button]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

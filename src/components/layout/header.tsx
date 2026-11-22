@@ -1,11 +1,9 @@
 import { Separator } from '../ui/separator';
 import { Breadcrumbs } from '../breadcrumbs';
 import SearchInput from '../search-input';
-import { ThemeSelector } from '../themes/theme-selector';
 import { ThemeModeToggle } from '../themes/theme-mode-toggle';
-import CtaGithub from './cta-github';
 import { SidebarToggle } from './sidebar-toggle';
-import { NotificationCenter } from '@/features/notifications/components/notification-center';
+import { RoleSwitcher } from '../role-switcher';
 
 export default function Header() {
   return (
@@ -19,14 +17,10 @@ export default function Header() {
         <Breadcrumbs />
       </div>
 
-      <div className='flex shrink-0 items-center gap-1'>
+      <div className='flex shrink-0 items-center gap-2'>
+        <RoleSwitcher />
         <SearchInput />
-        <CtaGithub />
         <ThemeModeToggle />
-        <div className='hidden sm:block'>
-          <ThemeSelector />
-        </div>
-        <NotificationCenter />
       </div>
     </header>
   );

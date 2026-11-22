@@ -4,9 +4,10 @@
 /node_modules
 /.pnp
 .pnp.js
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
+bun.lock
+bun.lockb
 
 # testing
 /coverage
@@ -47,5 +48,11 @@ next-env.d.ts
 .cursorrules
 /memory-bank
 
+# local tooling
+.tools/
+../.tools/
+
 # Sentry Config File
 .env.sentry-build-plugin
+
+/src/generated/prisma

@@ -1,0 +1,388 @@
+// HealthPilot ERP — Prisma schema
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum LocationType {
+  WAREHOUSE
+  BRANCH
+}
+
+enum UserRole {
+  ADMIN
+  PURCHASE_MANAGER
+  STORE_KEEPER
+  PHARMACIST
+  ACCOUNTS
+}
+
+enum StockStatus {
+  USABLE
+  QUARANTINE
+  IN_TRANSIT
+}
+
+enum DocStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  CANCELLED
+  AMENDED
+}
+
+enum GrnStatus {
+  DRAFT
+  POSTED
+  REVERSED
+  AMENDED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  MATCHED
+  DISCREPANT
+  APPROVED
+  PAID
+}
+
+enum TransferStatus {
+  DRAFT
+  DISPATCHED
+  RECEIVED
+  CANCELLED
+}
+
+enum SalesStatus {
+  DRAFT
+  POSTED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+}
+
+// ─── Masters ──────────────────────────────────────────────────────────────────
+
+model Item {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  unit          String   @default("Vial")
+  purchaseCost  Decimal  @db.Decimal(12, 4)
+  taxPct        Decimal  @db.Decimal(5, 2)
+  refrigerated  Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  poLines      PurchaseOrderLine[]
+  grnLines     GrnLine[]
+  ledgerEntries StockLedgerEntry[]
+  transferLines StockTransferLine[]
+  salesLines   SalesInvoiceLine[]
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  purchaseOrders PurchaseOrder[]
+  invoices       SupplierInvoice[]
+  creditNotes    CreditNote[]
+}
+
+model Location {
+  id        String       @id @default(cuid())
+  code      String       @unique
+  name      String
+  type      LocationType
+  createdAt DateTime     @default(now())
+
+  requisitions    MaterialRequisition[]
+  ledgerEntries   StockLedgerEntry[]
+  transfersFrom   StockTransfer[]        @relation("TransferFrom")
+  transfersTo     StockTransfer[]        @relation("TransferTo")
+  purchaseOrders  PurchaseOrder[]
+  grns            GoodsReceiptNote[]
+  salesInvoices   SalesInvoice[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  role      UserRole
+  createdAt DateTime @default(now())
+
+  requisitions   MaterialRequisition[]
+  auditLogs      AuditLog[]
+  ledgerEntries  StockLedgerEntry[]
+}
+
+// ─── Documents ────────────────────────────────────────────────────────────────
+
+model MaterialRequisition {
+  id            String    @id @default(cuid())
+  docNumber     String    @unique
+  locationId    String
+  requestedById String
+  postingDate   DateTime
+  status        DocStatus @default(DRAFT)
+  notes         String?
+  createdAt     DateTime  @default(now())
+
+  location    Location @relation(fields: [locationId], references: [id])
+  requestedBy User     @relation(fields: [requestedById], references: [id])
+  lines       MaterialRequisitionLine[]
+}
+
+model MaterialRequisitionLine {
+  id              String  @id @default(cuid())
+  requisitionId   String
+  itemId          String? // soft ref; keep flexible
+  itemDescription String
+  qtyRequested    Int
+  qtyFulfilled    Int     @default(0)
+  unit            String  @default("Vial")
+
+  requisition MaterialRequisition @relation(fields: [requisitionId], references: [id])
+  poLines     PurchaseOrderLine[]
+}
+
+model PurchaseOrder {
+  id            String    @id @default(cuid())
+  docNumber     String    @unique
+  supplierId    String
+  deliverToId   String
+  postingDate   DateTime
+  expectedDate  DateTime
+  status        DocStatus @default(DRAFT)
+  notes         String?
+  createdAt     DateTime  @default(now())
+
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  deliverTo  Location @relation(fields: [deliverToId], references: [id])
+  lines      PurchaseOrderLine[]
+  grns       GoodsReceiptNote[]
+  invoices   SupplierInvoice[]
+}
+
+model PurchaseOrderLine {
+  id            String  @id @default(cuid())
+  poId          String
+  itemId        String
+  reqLineId     String?
+  qtyOrdered    Int
+  unitCost      Decimal @db.Decimal(12, 4)
+  taxPct        Decimal @db.Decimal(5, 2)
+
+  po      PurchaseOrder            @relation(fields: [poId], references: [id])
+  item    Item                     @relation(fields: [itemId], references: [id])
+  reqLine MaterialRequisitionLine? @relation(fields: [reqLineId], references: [id])
+  grnLines GrnLine[]
+}
+
+model GoodsReceiptNote {
+  id             String    @id @default(cuid())
+  docNumber      String    @unique
+  poId           String
+  locationId     String
+  challanRef     String?
+  postingDate    DateTime
+  status         GrnStatus @default(DRAFT)
+  amendedFromId  String?   // points to reversed GRN
+  notes          String?
+  createdAt      DateTime  @default(now())
+
+  po          PurchaseOrder @relation(fields: [poId], references: [id])
+  location    Location      @relation(fields: [locationId], references: [id])
+  amendedFrom GoodsReceiptNote?  @relation("GrnAmendment", fields: [amendedFromId], references: [id])
+  amendments  GoodsReceiptNote[] @relation("GrnAmendment")
+  lines       GrnLine[]
+}
+
+model GrnLine {
+  id          String  @id @default(cuid())
+  grnId       String
+  poLineId    String
+  itemId      String
+  batchNumber String?
+  expiryDate  DateTime?
+  qtyOrdered  Int
+  qtyDelivered Int
+  qtyAccepted  Int
+  qtyRejected  Int
+  qtyShort     Int     // delivered - accepted - rejected (not in physical stock)
+  unitCost     Decimal @db.Decimal(12, 4)
+  notes        String?
+
+  grn    GoodsReceiptNote  @relation(fields: [grnId], references: [id])
+  poLine PurchaseOrderLine @relation(fields: [poLineId], references: [id])
+  item   Item              @relation(fields: [itemId], references: [id])
+}
+
+model SupplierInvoice {
+  id               String        @id @default(cuid())
+  docNumber        String        @unique
+  supplierId       String
+  poId             String
+  invoicedQty      Int
+  invoicedAmount   Decimal       @db.Decimal(14, 4)
+  payableAmount    Decimal       @db.Decimal(14, 4)  @default(0)
+  disputedAmount   Decimal       @db.Decimal(14, 4)  @default(0)
+  taxAmount        Decimal       @db.Decimal(14, 4)  @default(0)
+  postingDate      DateTime
+  status           InvoiceStatus @default(DRAFT)
+  notes            String?
+  createdAt        DateTime      @default(now())
+
+  supplier    Supplier    @relation(fields: [supplierId], references: [id])
+  po          PurchaseOrder @relation(fields: [poId], references: [id])
+  creditNotes CreditNote[]
+  payments    Payment[]
+}
+
+model CreditNote {
+  id              String   @id @default(cuid())
+  docNumber       String   @unique
+  supplierId      String
+  invoiceId       String
+  qtyReturned     Int
+  creditAmount    Decimal  @db.Decimal(14, 4)
+  reason          String?
+  postingDate     DateTime
+  createdAt       DateTime @default(now())
+
+  supplier Supplier        @relation(fields: [supplierId], references: [id])
+  invoice  SupplierInvoice @relation(fields: [invoiceId], references: [id])
+}
+
+model StockTransfer {
+  id            String         @id @default(cuid())
+  docNumber     String         @unique
+  fromLocationId String
+  toLocationId  String
+  status        TransferStatus @default(DRAFT)
+  dispatchDate  DateTime?
+  receiveDate   DateTime?
+  createdAt     DateTime       @default(now())
+  notes         String?
+
+  fromLocation Location        @relation("TransferFrom", fields: [fromLocationId], references: [id])
+  toLocation   Location        @relation("TransferTo",   fields: [toLocationId],   references: [id])
+  lines        StockTransferLine[]
+}
+
+model StockTransferLine {
+  id           String  @id @default(cuid())
+  transferId   String
+  itemId       String
+  batchNumber  String?
+  expiryDate   DateTime?
+  qty          Int
+  unitCost     Decimal @db.Decimal(12, 4)
+
+  transfer StockTransfer @relation(fields: [transferId], references: [id])
+  item     Item          @relation(fields: [itemId], references: [id])
+}
+
+model SalesInvoice {
+  id          String      @id @default(cuid())
+  docNumber   String      @unique
+  locationId  String
+  postingDate DateTime
+  status      SalesStatus @default(DRAFT)
+  taxPct      Decimal     @db.Decimal(5, 2)
+  notes       String?
+  createdAt   DateTime    @default(now())
+
+  location Location           @relation(fields: [locationId], references: [id])
+  lines    SalesInvoiceLine[]
+  payments Payment[]
+}
+
+model SalesInvoiceLine {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  itemId      String
+  batchNumber String?
+  expiryDate  DateTime?
+  qty         Int
+  unitSalePrice Decimal @db.Decimal(12, 4)
+  cogs        Decimal @db.Decimal(12, 4) // at purchase unit cost
+
+  invoice SalesInvoice @relation(fields: [invoiceId], references: [id])
+  item    Item         @relation(fields: [itemId], references: [id])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  docNumber     String        @unique
+  invoiceId     String?
+  salesId       String?
+  amount        Decimal       @db.Decimal(14, 4)
+  method        String        // Cash, Card, Bank Transfer
+  postingDate   DateTime
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+
+  invoice  SupplierInvoice? @relation(fields: [invoiceId], references: [id])
+  sales    SalesInvoice?    @relation(fields: [salesId],   references: [id])
+}
+
+// ─── Ledger ───────────────────────────────────────────────────────────────────
+
+model StockLedgerEntry {
+  id             String      @id @default(cuid())
+  itemId         String
+  locationId     String
+  batchNumber    String?
+  expiryDate     DateTime?
+  stockStatus    StockStatus
+  qty            Int         // positive = in, negative = out
+  unitCost       Decimal     @db.Decimal(12, 4)
+  sourceDocType  String      // "GRN" | "GRN_REVERSAL" | "TRANSFER_DISPATCH" | ...
+  sourceDocId    String
+  postingDate    DateTime
+  postedById     String
+  createdAt      DateTime    @default(now())
+
+  item     Item     @relation(fields: [itemId],     references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+  postedBy User     @relation(fields: [postedById], references: [id])
+
+  @@index([itemId, locationId, stockStatus])
+  @@index([sourceDocType, sourceDocId])
+  @@index([postingDate])
+}
+
+// ─── Audit ────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  entity     String   // e.g. "GoodsReceiptNote"
+  entityId   String
+  action     String   // e.g. "REVERSED", "AMENDED", "POSTED"
+  userId     String
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([entity, entityId])
+}
